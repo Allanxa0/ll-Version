@@ -26,6 +26,10 @@ bool GlacieMod::disable() {
     return true;
 }
 
+bool GlacieMod::unload() {
+    return true;
 }
 
-LL_REGISTER_MOD(glacie::GlacieMod, glacie::GlacieMod::getInstance());
+LL_REGISTER_MOD(GlacieMod, GlacieMod::getInstance());
+
+}
