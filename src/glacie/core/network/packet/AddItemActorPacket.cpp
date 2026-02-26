@@ -11,7 +11,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     AddItemActorPacketWrite,
     ll::memory::HookPriority::Normal,
     AddItemActorPacket,
-    &AddItemActorPacket::write,
+    &AddItemActorPacket::$write,
     void,
     BinaryStream& bs
 ) {
@@ -22,15 +22,15 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 
     if (clientProtocol == 859 || clientProtocol == 860 || clientProtocol == 924) {
         
-        bs.writeVarInt64(this->mId.get().id, nullptr, nullptr);
-        bs.writeUnsignedVarInt64(this->mRuntimeId.get().id, nullptr, nullptr);
+        bs.writeVarInt64(this->mId.get(), nullptr, nullptr);
+        bs.writeUnsignedVarInt64(this->mRuntimeId.get(), nullptr, nullptr);
         
         bs.writeType(this->mItem.get());
         
         bs.writeType(this->mPos.get());
         bs.writeType(this->mVelocity.get());
 
-        bs.writeType(this->mUnpack.get());
+        bs.writeType(this->mData.get());
 
         bs.writeBool(this->mIsFromFishing.get(), nullptr, nullptr);
         
