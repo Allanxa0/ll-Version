@@ -64,7 +64,7 @@ LL_TYPE_INSTANCE_HOOK(
     DeferredDescriptorResolveHook,
     ll::memory::HookPriority::Normal,
     DeferredDescriptor,
-    &DeferredDescriptor::resolve,
+    &DeferredDescriptor::$resolve,
     std::unique_ptr<ItemDescriptor::BaseDescriptor>
 ) {
     if (!GlobalItemDataP) {
