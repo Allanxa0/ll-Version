@@ -4,50 +4,59 @@
 #include "mc/world/item/NetworkItemStackDescriptor.h"
 #include "mc/world/actor/SynchedActorDataEntityWrapper.h"
 #include "mc/world/actor/SerializedAbilitiesData.h"
+#include <unordered_map>
 
-extern void Serialize_630(NetworkItemStackDescriptor NetItem, BinaryStream* bs);
+extern uint64 GlobalGuid;
+extern std::unordered_map<uint64, int> PlayerGuidMap;
 
 LL_AUTO_TYPE_INSTANCE_HOOK(
     AddPlayerPacketWrite,
     ll::memory::HookPriority::Normal,
     AddPlayerPacket,
-    "?write@AddPlayerPacket@@UEBAXAEAVBinaryStream@@@Z",
+    &AddPlayerPacket::write,
     void,
     BinaryStream& bs
 ) {
-    if (this->mProtocolVersion == 630) {
-        bs.writeUnsignedInt64(this->mUuid.a);
-        bs.writeUnsignedInt64(this->mUuid.b);
-        bs.writeString(this->mName);
-        bs.writeUnsignedVarInt64(this->mRuntimeId.id);
-        bs.writeString(this->mPlatformOnlineId);
-        bs.writeType(this->mPos);
-        bs.writeType(this->mVelocity);
-        bs.writeFloat(this->mRot.x);
-        bs.writeFloat(this->mRot.y);
-        bs.writeFloat(this->mYHeadRot);
-        Serialize_630(this->mCarriedItem, &bs);
-        bs.writeVarInt((int)this->mPlayerGameType);
+    int clientProtocol = 898; 
+    if (GlobalGuid != 0 && PlayerGuidMap.count(GlobalGuid)) {
+        clientProtocol = PlayerGuidMap[GlobalGuid];
+    }
+
+    if (clientProtocol == 859 || clientProtocol == 860 || clientProtocol == 924) {
         
-        auto* mEntityData = reinterpret_cast<SynchedActorDataEntityWrapper*>(this->mEntityData);
-        if (mEntityData) {
-            auto packedData = mEntityData->packAll();
-            bs.writeType(packedData);
-        } else {
-            bs.writeType(this->mUnpack);
-        }
+        bs.writeUnsignedInt64(this->mUuid.get().a, nullptr, nullptr);
+        bs.writeUnsignedInt64(this->mUuid.get().b, nullptr, nullptr);
+        bs.writeString(this->mName.get(), nullptr, nullptr);
         
-        bs.writeType(this->mSynchedProperties);
-        auto abilitiesData = SerializedAbilitiesData(this->mEntityId, this->mAbilities);
+        bs.writeUnsignedVarInt64(this->mRuntimeId.get().id, nullptr, nullptr);
+        bs.writeString(this->mPlatformOnlineId.get(), nullptr, nullptr);
+        
+        bs.writeType(this->mPos.get());
+        bs.writeType(this->mVelocity.get());
+        
+        bs.writeFloat(this->mRot.get().x, nullptr, nullptr);
+        bs.writeFloat(this->mRot.get().y, nullptr, nullptr);
+        bs.writeFloat(this->mYHeadRot.get(), nullptr, nullptr);
+        
+        bs.writeType(this->mCarriedItem.get()); 
+        
+        bs.writeVarInt(static_cast<int>(this->mPlayerGameType.get()), nullptr, nullptr);
+        
+        bs.writeType(this->mUnpack.get());
+        
+        bs.writeType(this->mSynchedProperties.get());
+        
+        auto abilitiesData = SerializedAbilitiesData(this->mEntityId.get(), this->mAbilities.get());
         bs.writeType(abilitiesData);
         
-        bs.writeUnsignedVarInt(static_cast<uint>(this->mLinks.size()));
-        for (auto const& link : this->mLinks) { 
+        bs.writeUnsignedVarInt(static_cast<uint>(this->mLinks.get().size()), nullptr, nullptr);
+        for (auto const& link : this->mLinks.get()) { 
             bs.writeType(link); 
         }
         
-        bs.writeString(this->mDeviceId);
-        bs.writeUnsignedInt(static_cast<uint>(this->mBuildPlatform));
+        bs.writeString(this->mDeviceId.get(), nullptr, nullptr);
+        bs.writeUnsignedInt(static_cast<uint>(this->mBuildPlatform.get()), nullptr, nullptr);
+        
     } else {
         origin(bs);
     }
