@@ -20,9 +20,9 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
         clientProtocol = PlayerGuidMap[GlobalGuid];
     }
 
-    if (clientProtocol == 859 || clientProtocol == 860 || clientProtocol == 924) {
+    if (clientProtocol >= 859) {
         bs.writeVarInt64(this->mId.get().rawID, nullptr, nullptr);
-        bs.writeUnsignedVarInt64(this->mRuntimeId.get().id, nullptr, nullptr);
+        bs.writeUnsignedVarInt64(this->mRuntimeId.get().rawID, nullptr, nullptr);
         
         bs.writeType(this->mItem.get());
         
