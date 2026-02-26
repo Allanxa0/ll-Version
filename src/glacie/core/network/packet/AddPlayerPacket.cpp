@@ -42,7 +42,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
         
         bs.writeType(this->mCarriedItem.get()); 
         
-        bs.writeVarInt(static_cast<int>(this->mPlayerGameType.get()), nullptr, nullptr);
+        bs.writeVarInt(static_cast<int>(this->mPlayerGameType), nullptr, nullptr);
         
         bs.writeType(this->mUnpack.get());
         
