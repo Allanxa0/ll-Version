@@ -26,38 +26,38 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 
     if (clientProtocol == 859 || clientProtocol == 860 || clientProtocol == 924) {
         
-        bs.writeUnsignedInt64(this->mUuid.a, nullptr, nullptr);
-        bs.writeUnsignedInt64(this->mUuid.b, nullptr, nullptr);
-        bs.writeString(this->mName, nullptr, nullptr);
+        bs.writeUnsignedInt64(this->mUuid.get().a, nullptr, nullptr);
+        bs.writeUnsignedInt64(this->mUuid.get().b, nullptr, nullptr);
+        bs.writeString(this->mName.get(), nullptr, nullptr);
         
-        bs.writeUnsignedVarInt64(this->mRuntimeId.rawID, nullptr, nullptr);
-        bs.writeString(this->mPlatformOnlineId, nullptr, nullptr);
+        bs.writeUnsignedVarInt64(this->mRuntimeId.get().rawID, nullptr, nullptr);
+        bs.writeString(this->mPlatformOnlineId.get(), nullptr, nullptr);
         
-        bs.writeType(this->mPos);
-        bs.writeType(this->mVelocity);
+        bs.writeType(this->mPos.get());
+        bs.writeType(this->mVelocity.get());
         
-        bs.writeFloat(this->mRot.x, nullptr, nullptr);
-        bs.writeFloat(this->mRot.y, nullptr, nullptr);
-        bs.writeFloat(this->mYHeadRot, nullptr, nullptr);
+        bs.writeFloat(this->mRot.get().x, nullptr, nullptr);
+        bs.writeFloat(this->mRot.get().y, nullptr, nullptr);
+        bs.writeFloat(this->mYHeadRot.get(), nullptr, nullptr);
         
-        bs.writeType(this->mCarriedItem); 
+        bs.writeType(this->mCarriedItem.get()); 
         
-        bs.writeVarInt(static_cast<int>(this->mPlayerGameType), nullptr, nullptr);
+        bs.writeVarInt(static_cast<int>(this->mPlayerGameType.get()), nullptr, nullptr);
         
-        bs.writeType(this->mUnpack);
+        bs.writeType(this->mUnpack.get());
         
-        bs.writeType(this->mSynchedProperties);
+        bs.writeType(this->mSynchedProperties.get());
         
-        auto abilitiesData = SerializedAbilitiesData(this->mEntityId, this->mAbilities);
+        auto abilitiesData = SerializedAbilitiesData(this->mEntityId.get(), this->mAbilities.get());
         bs.writeType(abilitiesData);
         
-        bs.writeUnsignedVarInt(static_cast<uint>(this->mLinks.size()), nullptr, nullptr);
-        for (auto const& link : this->mLinks) { 
+        bs.writeUnsignedVarInt(static_cast<uint>(this->mLinks.get().size()), nullptr, nullptr);
+        for (auto const& link : this->mLinks.get()) { 
             bs.writeType(link); 
         }
         
-        bs.writeString(this->mDeviceId, nullptr, nullptr);
-        bs.writeUnsignedInt(static_cast<uint>(this->mBuildPlatform), nullptr, nullptr);
+        bs.writeString(this->mDeviceId.get(), nullptr, nullptr);
+        bs.writeUnsignedInt(static_cast<uint>(this->mBuildPlatform.get()), nullptr, nullptr);
         
     } else {
         origin(bs);
