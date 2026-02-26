@@ -25,6 +25,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     }
 
     if (clientProtocol == 859 || clientProtocol == 860 || clientProtocol == 924) {
+        
         bs.writeUnsignedInt64(this->mUuid.get().a, nullptr, nullptr);
         bs.writeUnsignedInt64(this->mUuid.get().b, nullptr, nullptr);
         bs.writeString(this->mName.get(), nullptr, nullptr);
@@ -57,6 +58,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
         
         bs.writeString(this->mDeviceId.get(), nullptr, nullptr);
         bs.writeUnsignedInt(static_cast<uint>(this->mBuildPlatform.get()), nullptr, nullptr);
+        
     } else {
         origin(bs);
     }
