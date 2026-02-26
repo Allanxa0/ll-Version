@@ -1,7 +1,9 @@
 #include "glacie/core/block/GlobalBlockPalette.h"
+#include "glacie/core/GlacieMod.h"
 #include "ll/api/io/Logger.h"
 #include "ll/api/mod/NativeMod.h"
 #include "ll/api/memory/Hook.h"
+#include "ll/api/memory/Symbol.h"
 #include <fstream>
 #include <vector>
 
@@ -70,14 +72,14 @@ uint GlobalBlockPalette::getBlockRuntimeIdFromOther(int protocol, uint oldruntim
 LL_AUTO_STATIC_HOOK(
     InitFromBlockDefinitions,
     ll::memory::HookPriority::Normal,
-    "?initFromBlockDefinitions@BlockPalette@@QEAAXXZ",
+    ll::memory::SymbolView("?initFromBlockDefinitions@BlockPalette@@QEAAXXZ"),
     void,
     void* a1
 ) {
     origin(a1);
-    ll::getLogger().info("Glacie is initializing, please wait!");
+    glacie::GlacieMod::getInstance().getSelf().getLogger().info("Glacie is initializing, please wait!");
     auto blockPalette = new GlobalBlockPalette();
     blockPalette->init();
     GlobalBlockP = blockPalette;
-    ll::getLogger().info("Glacie initialized successfully!");
+    glacie::GlacieMod::getInstance().getSelf().getLogger().info("Glacie initialized successfully!");
 }
