@@ -10,20 +10,24 @@
 GlobalItemData* GlobalItemDataP = nullptr;
 
 void GlobalItemData::init() {
-    auto json630 = initMap(L"ITEM_DATA_1_20_50");
-    auto json630_Content = initMap(L"CREATIVE_CONTENT_1_20_50");
-    
-    CREATIVE_CONTENTS[630] = json630_Content;
-    
-    std::vector<ItemData> vector630;
-    for (auto const& i : json630) {
-        vector630.emplace_back(
-            i["Name"].get<std::string>(),
-            i["Id"].get<short>(),
-            i["IsComponentBased"].get<bool>()
-        );
+    std::vector<int> protocols = {859, 860, 898, 924};
+
+    for (int protocol : protocols) {
+        auto jsonItems = initMap("ITEM_DATA_" + std::to_string(protocol));
+        auto jsonContent = initMap("CREATIVE_CONTENT_" + std::to_string(protocol));
+        
+        CREATIVE_CONTENTS[protocol] = jsonContent;
+        
+        std::vector<ItemData> vectorItems;
+        for (auto const& i : jsonItems) {
+            vectorItems.emplace_back(
+                i["Name"].get<std::string>(),
+                i["Id"].get<short>(),
+                i["IsComponentBased"].get<bool>()
+            );
+        }
+        ItemDataTable[protocol] = std::move(vectorItems);
     }
-    ItemDataTable[630] = std::move(vector630);
 }
 
 std::vector<ItemData> GlobalItemData::getItemData(int protocol) {

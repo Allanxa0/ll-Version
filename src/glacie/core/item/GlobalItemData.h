@@ -6,8 +6,6 @@
 #include <unordered_map>
 #include <vector>
 
-extern HMODULE t_hModule;
-
 struct ItemData {
     std::string mName;
     short mId;
@@ -20,7 +18,7 @@ public:
     std::unordered_map<int, std::vector<ItemData>> ItemDataTable;
     std::unordered_map<int, nlohmann::json>        CREATIVE_CONTENTS;
 
-    nlohmann::json initMap(LPCWSTR a1);
+    nlohmann::json initMap(std::string const& a1);
     void           init();
 
     std::vector<ItemData> getItemData(int protocol);

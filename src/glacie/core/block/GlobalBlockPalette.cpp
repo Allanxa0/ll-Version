@@ -7,70 +7,44 @@
 GlobalBlockPalette* GlobalBlockP;
 
 void GlobalBlockPalette::init() {
-    auto json776 = initMap(L"BLOCK_INFO_1_21_60");
-    auto json766 = initMap(L"BLOCK_INFO_1_21_50");
-    auto json748 = initMap(L"BLOCK_INFO_1_21_40");
+    std::vector<int> protocols = {859, 860, 898, 924};
+    std::unordered_map<int, nlohmann::json> jsonMaps;
 
-    for (nlohmann::json::iterator it = json748.begin(); it != json748.end(); ++it) {
+    for (int protocol : protocols) {
+        jsonMaps[protocol] = initMap("BLOCK_INFO_" + std::to_string(protocol));
+    }
+
+    auto jsonMain = initMap("BLOCK_INFO_MAIN");
+
+    for (nlohmann::json::iterator it = jsonMain.begin(); it != jsonMain.end(); ++it) {
         for (auto info : it.value()) {
-            {
-                int  data          = info["data"];
-                auto blocktypename = it.key();
-                if (blocktypename == "minecraft:white_stained_glass") { blocktypename = "minecraft:stained_glass"; }
-                if (blocktypename == "minecraft:white_stained_glass_pane") {
-                    blocktypename = "minecraft:stained_glass_pane";
-                }
-                if (blocktypename == "minecraft:white_terracotta") {
-                    blocktypename = "minecraft:stained_hardened_clay";
-                }
+            int data = info["data"];
+            auto blocktypename = it.key();
 
-                auto oldblock729 = json729[blocktypename];
-                for (auto oldinfo729 : oldblock729) {
-                    if (oldinfo729["data"] == data) {
-                        RunTimeIdTable[729][info["hashruntimeid"]]          = oldinfo729["hashruntimeid"];
-                        RunTimeIdTableOld[729][oldinfo729["hashruntimeid"]] = info["hashruntimeid"];
-                    }
-                }
-            }
+            if (blocktypename == "minecraft:white_stained_glass") blocktypename = "minecraft:stained_glass";
+            if (blocktypename == "minecraft:white_stained_glass_pane") blocktypename = "minecraft:stained_glass_pane";
+            if (blocktypename == "minecraft:white_terracotta") blocktypename = "minecraft:stained_hardened_clay";
+            if (blocktypename == "minecraft:planks") blocktypename = "minecraft:oak_planks";
 
-            {
-                auto oldblock766 = json766[it.key()];
-                for (auto oldinfo766 : oldblock766) {
-                    int data = info["data"];
-                    if (it.key() == "minecraft:chest" || it.key() == "minecraft:ender_chest"
-                        || it.key() == "minecraft:stonecutter_block" || it.key() == "minecraft:trapped_chest") {
-                        if (data == 2) data = 2;
-                        else if (data == 3) data = 0;
-                        else if (data == 4) data = 1;
-                        else if (data == 5) data = 3;
-                        else continue;
-                    }
-                    if (oldinfo766["data"] == data) {
-                        RunTimeIdTable[766][info["hashruntimeid"]]          = oldinfo766["hashruntimeid"];
-                        RunTimeIdTableOld[766][oldinfo766["hashruntimeid"]] = info["hashruntimeid"];
-                    }
-                }
-            }
-            {
-                auto blocktypename = it.key();
-                if (blocktypename == "minecraft:planks") { blocktypename = "minecraft:oak_planks"; }
-
-                auto oldblock776 = json776[blocktypename];
-                for (auto oldinfo776 : oldblock776) {
-                    int data = info["data"];
+            for (int protocol : protocols) {
+                if (!jsonMaps[protocol].contains(blocktypename)) continue;
+                
+                auto oldblock = jsonMaps[protocol][blocktypename];
+                for (auto oldinfo : oldblock) {
+                    int compareData = data;
+                    
                     if (blocktypename == "minecraft:chest" || blocktypename == "minecraft:ender_chest"
-                        || blocktypename == "minecraft:stonecutter_block"
-                        || blocktypename == "minecraft:trapped_chest") {
-                        if (data == 2) data = 2;      
-                        else if (data == 3) data = 0; 
-                        else if (data == 4) data = 1; 
-                        else if (data == 5) data = 3; 
+                        || blocktypename == "minecraft:stonecutter_block" || blocktypename == "minecraft:trapped_chest") {
+                        if (compareData == 2) compareData = 2;
+                        else if (compareData == 3) compareData = 0;
+                        else if (compareData == 4) compareData = 1;
+                        else if (compareData == 5) compareData = 3;
                         else continue;
                     }
 
-                    if (oldinfo776["data"] == data) {
-                        RunTimeIdTable[776][info["hashruntimeid"]]          = oldinfo776["hashruntimeid"];
-                        RunTimeIdTableOld[776][oldinfo776["hashruntimeid"]] = info["hashruntimeid"];
+                    if (oldinfo["data"] == compareData) {
+                        RunTimeIdTable[protocol][info["hashruntimeid"]] = oldinfo["hashruntimeid"];
+                        RunTimeIdTableOld[protocol][oldinfo["hashruntimeid"]] = info["hashruntimeid"];
                     }
                 }
             }
