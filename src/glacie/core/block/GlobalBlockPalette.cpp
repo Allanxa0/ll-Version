@@ -1,8 +1,9 @@
 #include "glacie/core/block/GlobalBlockPalette.h"
 #include "ll/api/io/Logger.h"
-#include "ll/core/LeviLamina.h"
+#include "ll/api/mod/NativeMod.h"
 #include "ll/api/memory/Hook.h"
 #include <fstream>
+#include <vector>
 
 GlobalBlockPalette* GlobalBlockP;
 
@@ -68,7 +69,7 @@ uint GlobalBlockPalette::getBlockRuntimeIdFromOther(int protocol, uint oldruntim
 
 LL_AUTO_STATIC_HOOK(
     InitFromBlockDefinitions,
-    HookPriority::Normal,
+    ll::memory::HookPriority::Normal,
     "?initFromBlockDefinitions@BlockPalette@@QEAAXXZ",
     void,
     void* a1

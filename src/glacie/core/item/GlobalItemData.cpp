@@ -44,9 +44,9 @@ nlohmann::json GlobalItemData::getContent(int protocol) {
     return nlohmann::json::object();
 }
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     DeferredDescriptorInitHook,
-    HookPriority::Normal,
+    ll::memory::HookPriority::Normal,
     DeferredDescriptor,
     &DeferredDescriptor::_initFromItem,
     std::unique_ptr<ItemDescriptor::BaseDescriptor>,
@@ -60,11 +60,11 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     return origin(std::move(item), aux);
 }
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     DeferredDescriptorResolveHook,
-    HookPriority::Normal,
+    ll::memory::HookPriority::Normal,
     DeferredDescriptor,
-    &DeferredDescriptor::$resolve,
+    &DeferredDescriptor::resolve,
     std::unique_ptr<ItemDescriptor::BaseDescriptor>
 ) {
     if (!GlobalItemDataP) {
