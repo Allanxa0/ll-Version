@@ -15,15 +15,14 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     void,
     BinaryStream& bs
 ) {
-    int clientProtocol = 0; 
+    int clientProtocol = 898; 
     if (GlobalGuid != 0 && PlayerGuidMap.count(GlobalGuid)) {
         clientProtocol = PlayerGuidMap[GlobalGuid];
     }
 
     if (clientProtocol == 859 || clientProtocol == 860 || clientProtocol == 924) {
-        
         bs.writeVarInt64(this->mId.get().rawID, nullptr, nullptr);
-        bs.writeUnsignedVarInt64(this->mRuntimeId.get().rawID, nullptr, nullptr);
+        bs.writeUnsignedVarInt64(this->mRuntimeId.get().id, nullptr, nullptr);
         
         bs.writeType(this->mItem.get());
         
@@ -33,7 +32,6 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
         bs.writeType(this->mData.get());
 
         bs.writeBool(this->mIsFromFishing.get(), nullptr, nullptr);
-        
     } else {
         origin(bs);
     }
