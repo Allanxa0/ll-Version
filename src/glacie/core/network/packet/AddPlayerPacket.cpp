@@ -4,6 +4,8 @@
 #include "mc/world/item/NetworkItemStackDescriptor.h"
 #include "mc/world/actor/SynchedActorDataEntityWrapper.h"
 #include "mc/world/actor/SerializedAbilitiesData.h"
+#include "mc/world/actor/ActorLink.h"
+#include "mc/legacy/ActorRuntimeID.h"
 #include <unordered_map>
 
 extern uint64 GlobalGuid;
@@ -13,7 +15,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     AddPlayerPacketWrite,
     ll::memory::HookPriority::Normal,
     AddPlayerPacket,
-    &AddPlayerPacket::write,
+    &AddPlayerPacket::$write,
     void,
     BinaryStream& bs
 ) {
@@ -28,7 +30,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
         bs.writeUnsignedInt64(this->mUuid.get().b, nullptr, nullptr);
         bs.writeString(this->mName.get(), nullptr, nullptr);
         
-        bs.writeUnsignedVarInt64(this->mRuntimeId.get().id, nullptr, nullptr);
+        bs.writeUnsignedVarInt64(this->mRuntimeId.get().rawID, nullptr, nullptr);
         bs.writeString(this->mPlatformOnlineId.get(), nullptr, nullptr);
         
         bs.writeType(this->mPos.get());
