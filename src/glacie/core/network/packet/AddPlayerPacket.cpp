@@ -57,7 +57,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
         }
         
         bs.writeString(this->mDeviceId.get(), nullptr, nullptr);
-        bs.writeUnsignedInt(static_cast<uint>(this->mBuildPlatform.get()), nullptr, nullptr);
+        bs.writeVarInt(static_cast<int>(this->mBuildPlatform), nullptr, nullptr);
         
     } else {
         origin(bs);
