@@ -1,4 +1,5 @@
 #include "ll/api/memory/Hook.h"
+#include "ll/api/memory/Symbol.h"
 #include "mc/network/LoopbackPacketSender.h"
 #include "mc/network/Packet.h"
 #include "mc/network/packet/TextPacket.h"
@@ -11,14 +12,14 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     CameraInstructionPacketSend,
     ll::memory::HookPriority::Normal,
     LoopbackPacketSender,
-    "?sendToClient@LoopbackPacketSender@@UEAAXPEBVUserEntityIdentifierComponent@@AEBVPacket@@@Z",
+    ll::memory::SymbolView("?sendToClient@LoopbackPacketSender@@UEAAXPEBVUserEntityIdentifierComponent@@AEBVPacket@@@Z"),
     void,
     UserEntityIdentifierComponent const* a2,
     Packet const& a3
 ) {
     if (a2) {
-        auto protocol = PlayerGuidMap[a2->mNetworkId.mGuid.g];
-        if (protocol < 618) {
+        auto protocol = PlayerGuidMap[a2->mNetworkId.get().mGuid.g];
+        if (protocol != 0 && protocol < 859) {
             if (a3.getId() == MinecraftPacketIds::CameraInstruction) {
                 auto pkt = TextPacket::createTranslated(
                     "%packdiscoveryerror.invalid_capability_value",
