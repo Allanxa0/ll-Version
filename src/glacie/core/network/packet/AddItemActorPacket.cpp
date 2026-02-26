@@ -15,15 +15,15 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     void,
     BinaryStream& bs
 ) {
-    int clientProtocol = 898; 
+    int clientProtocol = 0; 
     if (GlobalGuid != 0 && PlayerGuidMap.count(GlobalGuid)) {
         clientProtocol = PlayerGuidMap[GlobalGuid];
     }
 
     if (clientProtocol == 859 || clientProtocol == 860 || clientProtocol == 924) {
         
-        bs.writeVarInt64(this->mId.get(), nullptr, nullptr);
-        bs.writeUnsignedVarInt64(this->mRuntimeId.get(), nullptr, nullptr);
+        bs.writeVarInt64(this->mId.get().rawID, nullptr, nullptr);
+        bs.writeUnsignedVarInt64(this->mRuntimeId.get().rawID, nullptr, nullptr);
         
         bs.writeType(this->mItem.get());
         
