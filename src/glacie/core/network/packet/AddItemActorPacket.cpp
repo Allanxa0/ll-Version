@@ -31,7 +31,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 
         bs.writeType(this->mData.get());
 
-        bs.writeBool(this->mIsFromFishing.get(), nullptr, nullptr);
+        bs.writeBool(this->mIsFromFishing, nullptr, nullptr);
     } else {
         origin(bs);
     }
