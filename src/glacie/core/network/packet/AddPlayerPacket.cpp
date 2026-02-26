@@ -38,7 +38,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
         
         bs.writeFloat(this->mRot.get().x, nullptr, nullptr);
         bs.writeFloat(this->mRot.get().y, nullptr, nullptr);
-        bs.writeFloat(this->mYHeadRot.get(), nullptr, nullptr);
+        bs.writeFloat(this->mYHeadRot, nullptr, nullptr);
         
         bs.writeType(this->mCarriedItem.get()); 
         
