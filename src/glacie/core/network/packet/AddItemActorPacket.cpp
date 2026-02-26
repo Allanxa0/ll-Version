@@ -2,33 +2,38 @@
 #include "mc/network/packet/AddItemActorPacket.h"
 #include "mc/world/item/NetworkItemStackDescriptor.h"
 #include "mc/deps/core/utility/BinaryStream.h"
+#include <unordered_map>
 
-extern void Serialize_630(NetworkItemStackDescriptor NetItem, BinaryStream* bs);
+extern uint64 GlobalGuid;
+extern std::unordered_map<uint64, int> PlayerGuidMap;
 
 LL_AUTO_TYPE_INSTANCE_HOOK(
     AddItemActorPacketWrite,
     ll::memory::HookPriority::Normal,
     AddItemActorPacket,
-    "?write@AddItemActorPacket@@UEBAXAEAVBinaryStream@@@Z",
+    &AddItemActorPacket::write,
     void,
     BinaryStream& bs
 ) {
-    if (this->mProtocolVersion == 630) {
-        bs.writeVarInt64(this->mId.id);
-        bs.writeUnsignedVarInt64(this->mRuntimeId.id);
-        Serialize_630(this->mItem, &bs);
-        bs.writeFloat(this->mPos.x);
-        bs.writeFloat(this->mPos.y);
-        bs.writeFloat(this->mPos.z);
-        bs.writeFloat(this->mVelocity.x);
-        bs.writeFloat(this->mVelocity.y);
-        bs.writeFloat(this->mVelocity.z);
-        if (this->mEntityData) {
-            bs.writeType(this->mEntityData->packAll());
-        } else {
-            bs.writeType(this->mData);
-        }
-        bs.writeBool(this->mIsFromFishing);
+    int clientProtocol = 898; 
+    if (GlobalGuid != 0 && PlayerGuidMap.count(GlobalGuid)) {
+        clientProtocol = PlayerGuidMap[GlobalGuid];
+    }
+
+    if (clientProtocol == 859 || clientProtocol == 860 || clientProtocol == 924) {
+        
+        bs.writeVarInt64(this->mId.get().id, nullptr, nullptr);
+        bs.writeUnsignedVarInt64(this->mRuntimeId.get().id, nullptr, nullptr);
+        
+        bs.writeType(this->mItem.get());
+        
+        bs.writeType(this->mPos.get());
+        bs.writeType(this->mVelocity.get());
+
+        bs.writeType(this->mUnpack.get());
+
+        bs.writeBool(this->mIsFromFishing.get(), nullptr, nullptr);
+        
     } else {
         origin(bs);
     }
