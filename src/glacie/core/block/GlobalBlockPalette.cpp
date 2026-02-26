@@ -1,16 +1,17 @@
 #include "glacie/core/block/GlobalBlockPalette.h"
-#include "glacie/core/internal/Logger.h"
+#include "ll/api/io/Logger.h"
+#include "ll/core/LeviLamina.h"
 #include "ll/api/memory/Hook.h"
 #include <fstream>
 
 GlobalBlockPalette* GlobalBlockP;
 
 void GlobalBlockPalette::init() {
-    auto json630 = initMap(L"BLOCK_INFO_1_20_50");
-    auto json622 = initMap(L"BLOCK_INFO_1_20_40");
-    auto json618 = initMap(L"BLOCK_INFO_1_20_30");
+    auto json776 = initMap(L"BLOCK_INFO_1_21_60");
+    auto json766 = initMap(L"BLOCK_INFO_1_21_50");
+    auto json748 = initMap(L"BLOCK_INFO_1_21_40");
 
-    for (nlohmann::json::iterator it = json618.begin(); it != json618.end(); ++it) {
+    for (nlohmann::json::iterator it = json748.begin(); it != json748.end(); ++it) {
         for (auto info : it.value()) {
             {
                 int  data          = info["data"];
@@ -23,18 +24,18 @@ void GlobalBlockPalette::init() {
                     blocktypename = "minecraft:stained_hardened_clay";
                 }
 
-                auto oldblock594 = json594[blocktypename];
-                for (auto oldinfo594 : oldblock594) {
-                    if (oldinfo594["data"] == data) {
-                        RunTimeIdTable[594][info["hashruntimeid"]]          = oldinfo594["hashruntimeid"];
-                        RunTimeIdTableOld[594][oldinfo594["hashruntimeid"]] = info["hashruntimeid"];
+                auto oldblock729 = json729[blocktypename];
+                for (auto oldinfo729 : oldblock729) {
+                    if (oldinfo729["data"] == data) {
+                        RunTimeIdTable[729][info["hashruntimeid"]]          = oldinfo729["hashruntimeid"];
+                        RunTimeIdTableOld[729][oldinfo729["hashruntimeid"]] = info["hashruntimeid"];
                     }
                 }
             }
 
             {
-                auto oldblock622 = json622[it.key()];
-                for (auto oldinfo622 : oldblock622) {
+                auto oldblock766 = json766[it.key()];
+                for (auto oldinfo766 : oldblock766) {
                     int data = info["data"];
                     if (it.key() == "minecraft:chest" || it.key() == "minecraft:ender_chest"
                         || it.key() == "minecraft:stonecutter_block" || it.key() == "minecraft:trapped_chest") {
@@ -44,9 +45,9 @@ void GlobalBlockPalette::init() {
                         else if (data == 5) data = 3;
                         else continue;
                     }
-                    if (oldinfo622["data"] == data) {
-                        RunTimeIdTable[622][info["hashruntimeid"]]          = oldinfo622["hashruntimeid"];
-                        RunTimeIdTableOld[622][oldinfo622["hashruntimeid"]] = info["hashruntimeid"];
+                    if (oldinfo766["data"] == data) {
+                        RunTimeIdTable[766][info["hashruntimeid"]]          = oldinfo766["hashruntimeid"];
+                        RunTimeIdTableOld[766][oldinfo766["hashruntimeid"]] = info["hashruntimeid"];
                     }
                 }
             }
@@ -54,8 +55,8 @@ void GlobalBlockPalette::init() {
                 auto blocktypename = it.key();
                 if (blocktypename == "minecraft:planks") { blocktypename = "minecraft:oak_planks"; }
 
-                auto oldblock630 = json630[blocktypename];
-                for (auto oldinfo630 : oldblock630) {
+                auto oldblock776 = json776[blocktypename];
+                for (auto oldinfo776 : oldblock776) {
                     int data = info["data"];
                     if (blocktypename == "minecraft:chest" || blocktypename == "minecraft:ender_chest"
                         || blocktypename == "minecraft:stonecutter_block"
@@ -67,9 +68,9 @@ void GlobalBlockPalette::init() {
                         else continue;
                     }
 
-                    if (oldinfo630["data"] == data) {
-                        RunTimeIdTable[630][info["hashruntimeid"]]          = oldinfo630["hashruntimeid"];
-                        RunTimeIdTableOld[630][oldinfo630["hashruntimeid"]] = info["hashruntimeid"];
+                    if (oldinfo776["data"] == data) {
+                        RunTimeIdTable[776][info["hashruntimeid"]]          = oldinfo776["hashruntimeid"];
+                        RunTimeIdTableOld[776][oldinfo776["hashruntimeid"]] = info["hashruntimeid"];
                     }
                 }
             }
@@ -99,9 +100,9 @@ LL_AUTO_STATIC_HOOK(
     void* a1
 ) {
     origin(a1);
-    Info("Glacie is initializing, please wait!");
+    ll::getLogger().info("Glacie is initializing, please wait!");
     auto blockPalette = new GlobalBlockPalette();
     blockPalette->init();
     GlobalBlockP = blockPalette;
-    Info("Glacie initialized successfully!");
+    ll::getLogger().info("Glacie initialized successfully!");
 }

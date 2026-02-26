@@ -1,13 +1,24 @@
+#pragma once
 #include "mc/_HeaderOutputPredefine.h"
 #include "nlohmann/json.hpp"
 #include <regex>
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 extern HMODULE t_hModule;
+
+struct ItemData {
+    std::string mName;
+    short mId;
+    bool mIsComponentBased;
+    ItemData(std::string name, short id, bool comp) : mName(std::move(name)), mId(id), mIsComponentBased(comp) {}
+};
+
 class GlobalItemData {
 public:
-    std::unordered_map<int, std::vector<struct ItemData>> ItemDataTable;
-    std::unordered_map<int, nlohmann::json>               CREATIVE_CONTENTS;
+    std::unordered_map<int, std::vector<ItemData>> ItemDataTable;
+    std::unordered_map<int, nlohmann::json>        CREATIVE_CONTENTS;
 
     nlohmann::json initMap(LPCWSTR a1);
     void           init();

@@ -12,7 +12,7 @@
 #include <unordered_set>
 
 std::unordered_map<uint64, int> PlayerGuidMap;
-std::unordered_set<int>         SupportProtocolList = {594, 618, 622, 630};
+std::unordered_set<int>         SupportProtocolList = {859, 860, 898, 924};
 
 LL_AUTO_TYPE_INSTANCE_HOOK(
     RequestNetworkSettingsPacketHandle,

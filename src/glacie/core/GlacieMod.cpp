@@ -17,7 +17,7 @@ bool GlacieMod::enable() {
     getSelf().getLogger().info("  _____ _            _    ");
     getSelf().getLogger().info(" / ____| |          (_)  ");
     getSelf().getLogger().info("| |  __| | __ _  ___ _  ___");
-    getSelf().getLogger().info("Glacie enabled successfully!.");
+    getSelf().getLogger().info("Glacie enabled successfully!");
     return true;
 }
 

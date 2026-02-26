@@ -1,9 +1,12 @@
+#pragma once
 #include "mc/_HeaderOutputPredefine.h"
 #include "nlohmann/json.hpp"
 #include <regex>
 #include <string>
+#include <unordered_map>
 
 extern HMODULE t_hModule;
+
 class GlobalBlockPalette {
 public:
     std::unordered_map<int, std::unordered_map<uint, uint>> RunTimeIdTable;
