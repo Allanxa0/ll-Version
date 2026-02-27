@@ -1,4 +1,5 @@
 #include "ll/api/memory/Hook.h"
+#include "ll/api/memory/Symbol.h"
 #include "mc/network/packet/CraftingDataPacket.h"
 #include "mc/deps/core/utility/BinaryStream.h"
 #include "mc/world/item/ItemInstance.h"
@@ -7,6 +8,8 @@
 #include "mc/world/item/registry/ItemRegistry.h"
 #include "mc/world/item/ItemDescriptor.h"
 #include "mc/world/item/crafting/Recipe.h"
+
+extern GlobalBlockPalette* GlobalBlockP;
 
 void InsSerialize_630(ItemInstance const& itemInstance, BinaryStream& stream) {
     NetworkItemInstanceDescriptor networkitem(itemInstance);
@@ -43,7 +46,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     CraftingDataPacketWrite,
     ll::memory::HookPriority::Normal,
     CraftingDataPacket,
-    "?write@CraftingDataPacket@@UEBAXAEAVBinaryStream@@@Z",
+    ll::memory::SymbolView("?write@CraftingDataPacket@@UEBAXAEAVBinaryStream@@@Z"),
     void,
     BinaryStream& bs
 ) {
