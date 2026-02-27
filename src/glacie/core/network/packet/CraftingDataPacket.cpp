@@ -8,12 +8,10 @@
 #include "mc/deps/core/utility/BinaryStream.h"
 #include "mc/world/item/ItemInstance.h"
 #include "mc/world/item/ItemStack.h"
-#include "mc/world/item/NetworkItemStackDescriptor.h"
+#include "mc/world/item/Item.h"
 #include "mc/world/item/registry/ItemRegistryManager.h"
-#include "mc/world/item/registry/ItemRegistry.h"
 #include "mc/world/item/ItemDescriptor.h"
 #include "mc/world/item/crafting/Recipe.h"
-#include "mc/world/item/crafting/RecipeIngredient.h"
 #include <unordered_map>
 #include <vector>
 
@@ -39,17 +37,23 @@ bool IsRecipeValid(CraftingDataEntry const& entry, int clientProtocol) {
     if (recipePtr) {
         auto const& recipe = *recipePtr;
         for (auto const& ing : recipe.mMyIngredients.get()) {
-            if (!ing.isNull() && ing.mImpl->getType() == ItemDescriptor::InternalType::Default) {
-                auto dItem = ing.mImpl->getItem().mItem;
-                if (dItem && !IsItemValid(dItem->getId(), clientProtocol)) {
+            if (!ing.isNull()) {
+                auto const* item = ing.getItem();
+                if (item && !IsItemValid(item->mId, clientProtocol)) {
                     return false;
                 }
             }
         }
         for (auto const& result : recipe.getResultItems()) {
-            if (!IsItemValid(result.getId(), clientProtocol)) {
+            auto const* item = result.getItem();
+            if (item && !IsItemValid(item->mId, clientProtocol)) {
                 return false;
             }
+        }
+    } else {
+        auto const& resultDescriptor = entry.mItemResult.get();
+        if (resultDescriptor.mId != 0 && !IsItemValid(resultDescriptor.mId, clientProtocol)) {
+            return false;
         }
     }
     return true;
@@ -83,11 +87,11 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     auto& newEntries = tempPacket.mCraftingEntries.get();
     newEntries.reserve(oldEntries.size());
 
-    for (auto const& recipe : oldEntries) {
-        if (IsRecipeValid(recipe, clientProtocol)) {
-            newEntries.push_back(recipe);
+    for (auto const& entry : oldEntries) {
+        if (IsRecipeValid(entry, clientProtocol)) {
+            newEntries.push_back(entry);
         }
     }
 
-    ((&tempPacket)->*_OriginalFunc)(bs);
+    ((&tempPacket)->*&CraftingDataPacket::write)(bs);
 }
