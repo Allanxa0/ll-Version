@@ -1,3 +1,3 @@
 # LeviLamina Mod Template
 
-Mod Template for LeviLamina
+Mod Template for LeviLamina1
