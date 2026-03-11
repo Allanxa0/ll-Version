@@ -6,55 +6,56 @@
 #include "mc/network/packet/ContainerMixDataEntry.h"
 #include "mc/network/packet/MaterialReducerDataEntry.h"
 #include "mc/deps/core/utility/BinaryStream.h"
-#include "mc/world/item/ItemInstance.h"
-#include "mc/world/item/ItemStack.h"
 #include "mc/world/item/Item.h"
-#include "mc/world/item/registry/ItemRegistryManager.h"
 #include "mc/world/item/ItemDescriptor.h"
 #include "mc/world/item/crafting/Recipe.h"
+#include "glacie/core/item/GlobalItemData.h"
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 extern uint64_t GlobalGuid;
 extern std::unordered_map<uint64_t, int> PlayerGuidMap;
-
-std::unordered_map<int16_t, int> ItemMinProtocolMap = {
-    
-};
+extern GlobalItemData* GlobalItemDataP;
 
 using namespace ll::memory_literals;
 
-bool IsItemValid(int16_t id, int clientProtocol) {
-    auto it = ItemMinProtocolMap.find(id);
-    if (it != ItemMinProtocolMap.end()) {
-        return clientProtocol >= it->second;
+static std::unordered_map<int, std::unordered_set<int16_t>> sValidItemsPerProtocol;
+static bool sItemSetsBuilt = false;
+
+static void ensureItemSetsBuilt() {
+    if (sItemSetsBuilt || !GlobalItemDataP) return;
+    sItemSetsBuilt = true;
+    for (int protocol : {859, 860, 898, 924}) {
+        for (auto const& item : GlobalItemDataP->getItemData(protocol)) {
+            sValidItemsPerProtocol[protocol].insert(item.mId);
+        }
     }
-    return true;
 }
 
-bool IsRecipeValid(CraftingDataEntry const& entry, int clientProtocol) {
+static bool isItemAvailable(int16_t id, int protocol) {
+    if (id == 0) return true;
+    auto it = sValidItemsPerProtocol.find(protocol);
+    if (it == sValidItemsPerProtocol.end()) return true;
+    return it->second.count(id) > 0;
+}
+
+static bool isEntryAvailable(CraftingDataEntry const& entry, int protocol) {
     auto const& recipePtr = entry.mRecipe.get();
     if (recipePtr) {
-        auto const& recipe = *recipePtr;
-        for (auto const& ing : recipe.mMyIngredients.get()) {
+        for (auto const& result : recipePtr->getResultItems()) {
+            auto const* item = result.getItem();
+            if (item && !isItemAvailable(item->mId, protocol)) return false;
+        }
+        for (auto const& ing : recipePtr->mMyIngredients.get()) {
             if (!ing.isNull()) {
                 auto const* item = ing.getItem();
-                if (item && !IsItemValid(item->mId, clientProtocol)) {
-                    return false;
-                }
-            }
-        }
-        for (auto const& result : recipe.getResultItems()) {
-            auto const* item = result.getItem();
-            if (item && !IsItemValid(item->mId, clientProtocol)) {
-                return false;
+                if (item && !isItemAvailable(item->mId, protocol)) return false;
             }
         }
     } else {
-        auto const& resultDescriptor = entry.mItemResult.get();
-        if (resultDescriptor.mId != 0 && !IsItemValid(resultDescriptor.mId, clientProtocol)) {
-            return false;
-        }
+        auto const& result = entry.mItemResult.get();
+        if (!isItemAvailable(result.getId(), protocol)) return false;
     }
     return true;
 }
@@ -67,7 +68,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     void,
     BinaryStream& bs
 ) {
-    int clientProtocol = 924; 
+    int clientProtocol = 924;
     if (GlobalGuid != 0 && PlayerGuidMap.count(GlobalGuid)) {
         clientProtocol = PlayerGuidMap[GlobalGuid];
     }
@@ -77,21 +78,22 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
         return;
     }
 
-    CraftingDataPacket tempPacket;
-    tempPacket.mClearRecipes.get() = this->mClearRecipes.get();
-    tempPacket.mPotionMixEntries.get() = this->mPotionMixEntries.get();
-    tempPacket.mContainerMixEntries.get() = this->mContainerMixEntries.get();
-    tempPacket.mMaterialReducerEntries.get() = this->mMaterialReducerEntries.get();
+    ensureItemSetsBuilt();
 
-    auto const& oldEntries = this->mCraftingEntries.get();
-    auto& newEntries = tempPacket.mCraftingEntries.get();
-    newEntries.reserve(oldEntries.size());
+    CraftingDataPacket filtered;
+    filtered.mClearRecipes.get()           = this->mClearRecipes.get();
+    filtered.mPotionMixEntries.get()       = this->mPotionMixEntries.get();
+    filtered.mContainerMixEntries.get()    = this->mContainerMixEntries.get();
+    filtered.mMaterialReducerEntries.get() = this->mMaterialReducerEntries.get();
 
-    for (auto const& entry : oldEntries) {
-        if (IsRecipeValid(entry, clientProtocol)) {
-            newEntries.push_back(entry);
+    auto& dest = filtered.mCraftingEntries.get();
+    dest.reserve(this->mCraftingEntries.get().size());
+
+    for (auto const& entry : this->mCraftingEntries.get()) {
+        if (isEntryAvailable(entry, clientProtocol)) {
+            dest.push_back(entry);
         }
     }
 
-    ((&tempPacket)->*&CraftingDataPacket::write)(bs);
+    ((&filtered)->*&CraftingDataPacket::write)(bs);
 }
