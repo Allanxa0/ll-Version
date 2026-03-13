@@ -49,7 +49,7 @@ void BossBarManager::send(
     BossBarColor        color,
     BossBarOverlay      overlay
 ) {
-    BossEventPacket pkt;
+    BossEventPacket pkt(false);
     pkt.mBossID         = bossID;
     pkt.mPlayerID       = player.getOrCreateUniqueID();
     pkt.mEventType      = type;
@@ -94,22 +94,22 @@ string BossBarManager::buildTitle(ServerPlayer& player, PlayerState& state, Leve
 
     if (mConfig->showCoords) {
         auto pos = player.getPosition();
-        title += " §7| §fX:" + to_string((int)pos.x)
-               + " Y:"       + to_string((int)pos.y)
-               + " Z:"       + to_string((int)pos.z);
+        title += " \xa7\x37| \xa7\x66X:" + to_string((int)pos.x)
+               + " Y:"                   + to_string((int)pos.y)
+               + " Z:"                   + to_string((int)pos.z);
     }
 
     if (mConfig->showStatus) {
-        if      (state.isSneaking)  title += " §e[SNEAK]";
-        else if (state.isSprinting) title += " §b[SPRINT]";
+        if      (state.isSneaking)  title += " \xa7\x65[SNEAK]";
+        else if (state.isSprinting) title += " \xa7\x62[SPRINT]";
     }
 
     if (mConfig->showDeaths) {
-        title += " §c💀" + to_string(state.deaths);
+        title += " \xa7\x63\xf0\x9f\x92\x80" + to_string(state.deaths);
     }
 
     if (mConfig->showDimPop) {
-        title += " §a👥" + to_string(countPlayersInDim(level, dimId));
+        title += " \xa7\x61\xf0\x9f\x91\xa5" + to_string(countPlayersInDim(level, dimId));
     }
 
     return title;
